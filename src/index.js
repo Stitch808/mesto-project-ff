@@ -1,3 +1,5 @@
+import './pages/index.css';
+
 // @todo: Темплейт карточки
 // @todo: DOM узлы
 const cardTemplate = document.querySelector('#card-template').content;
