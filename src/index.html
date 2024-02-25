@@ -15,7 +15,7 @@
   <main class="content">
     <section class="profile page__section">
       <div class="profile__image"
-      style="background-image: url('<%=require(`./images/avatar.jpg`)%>');"></div>
+      style="background-image: url(<%=require('./images/avatar.jpg')%>);"></div>
       ></div>
       <div class="profile__info">
         <h1 class="profile__title">Жак-Ив Кусто</h1>
@@ -64,8 +64,6 @@
     </div>
   </div>
 </div>
-<script src="./scripts/cards.js"></script>
-<script src="./index.js" defer></script>
 
 <template id="card-template">
   <li class="places__item card">

@@ -1,4 +1,6 @@
-import './pages/index.css';
+import './pages/index.css'; 
+import {initialCards} from './scripts/cards.js';
+
 
 // @todo: Темплейт карточки
 // @todo: DOM узлы
@@ -21,19 +23,23 @@ function getCard(iteam, deletCard) {
 
 	return cardElement;
 
-}
+};
 
 // @todo: Функция создания карточки
-function addCard(cardData) {
-	cardList.append(getCard(cardData, deletCard))
-}
+function addCard(name, link) {
+	const iteam = {
+		name, 
+		link
+	}
+	cardList.append(getCard(iteam, deletCard))
+};
 
 // @todo: Функция удаления карточки
-function deletCard(cardElement) {
-  cardElement.remove();
-}
+function deletCard(iteam) {
+	iteam.remove();
+};
 
 // @todo: Вывести карточки на страницу
 initialCards.forEach((function(element) {
-	addCard(element)
-}))
+	addCard(element.name, element.link)
+}));
