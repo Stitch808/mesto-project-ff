@@ -70,6 +70,7 @@ function openImagePopup(evt) {
   openPopup(popupTypeImage);
   popupImage.src = cardImage.src;
   popupCaption.textContent = cardImage.alt;
+  popupImage.alt = cardImage.alt
 }
 
 //Создание новой карточки
