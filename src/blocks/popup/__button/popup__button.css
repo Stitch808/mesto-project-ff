@@ -25,3 +25,15 @@
     line-height: 17px;
   }
 }
+
+.popup__button_inactive {
+  background-color: white;
+  color: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.popup__button_inactive:hover {
+  box-shadow: none;
+  cursor: default;
+  background: none
+}
