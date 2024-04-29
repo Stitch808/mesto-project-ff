@@ -1,9 +1,9 @@
 import "./pages/index.css";
 import { initialCards } from "./scripts/cards.js";
-import { getCard, deletCard, likeCard } from "./scripts/card.js";
+import { getCard, cardRemove, likeCard, likeHandlers } from "./scripts/card.js";
 import { openPopup, close } from "./scripts/modal.js";
 import {clearValidation, enableValidation} from "./scripts/validation.js"
-
+import {getInitialCards, getInitialUser, editProfile, postNewCard, editAvatar} from "./scripts/api.js"
 
 
 // @todo: Темплейт карточки
@@ -17,7 +17,7 @@ let profileId = '';
 
 // @todo: Вывести карточки на страницу
 const renderCard = (cardInfo, method = "prepend") => {
-  const cardElement = getCard(cardInfo, deletCard, likeCard, openImagePopup, profileId)
+  const cardElement = getCard(cardInfo, cardRemove, openImagePopup, profileId)
   cardList[ method ](cardElement)
 }
 
@@ -35,6 +35,10 @@ const jobInput = document.querySelector(".popup__input_type_description");
 const formElementNewPlace = document.querySelector('.popup__form[name="new-place"]');
 const popupInputTypeCardName = document.querySelector(".popup__input_type_card-name");
 const popupInputTypeUrl = document.querySelector(".popup__input_type_url");
+const profileImage = document.querySelector(".profile__image");
+const formElementNewProfileImage = document.querySelector('.popup__form[name="new-profile_image"]')
+const popupNewProfileImage = document.querySelector(".popup__new_profile_image");
+const popupInputTypeAvatar = document.querySelector(".popup__input_type_avatar")
 
 //классы для привязки
 export const validationConfig = { 
@@ -55,17 +59,21 @@ const setProfileInfo = (profileData) => {
   profileTitle.textContent = profileData.name;
   profileDescription.textContent = profileData.about;
   profileId = profileData._id;
+  setProfileAvatar(profileData)
 }
 
 // Обработчик «отправки» формы
 function handleFormSubmit(evt) {
   evt.preventDefault();
+  function makeRequest(){
     return editProfile(popupInputTypeName.value, popupInputTypeDescription.value).then((profileData) => {
       profileTitle.textContent = profileData.name;
       profileDescription.textContent = profileData.about;
       close(popupEdit);
     })
   }
+  handleSubmit(makeRequest, evt) 
+}
   
 formElementEditProfile.addEventListener("submit", handleFormSubmit);
 
@@ -96,14 +104,14 @@ function createNewCard(evt) {
     name: popupInputTypeCardName.value,
     link: popupInputTypeUrl.value,
   };
-
-  return postNewCard(cardInfo.name, cardInfo.link).then((card) => {
-    renderCard(card);
-    close(popupTypeNewCard);
-  }) 
+  function makeRequest(){
+    return postNewCard(cardInfo.name, cardInfo.link).then((card) => {
+      renderCard(card);
+      close(popupTypeNewCard);
+    }) 
+  }
+  handleSubmit(makeRequest, evt)
 }
-
-enableValidation(validationConfig)
 
 formElementNewPlace.addEventListener("submit", createNewCard);
 
@@ -112,105 +120,77 @@ profileAddButton.addEventListener("click", function () {
   clearValidation(formElementNewPlace, validationConfig)
 });
 
-//считаем лайки
+//редачим аву
+const setProfileAvatar = (profileData) => {
+  profileImage.setAttribute('style', `background-image: url('${profileData.avatar}');`)
+}
+
+function createNewProfileImage(evt) {
+  evt.preventDefault();
+  const cardInfo = {
+    link: popupInputTypeAvatar.value,
+  };
+  function makeRequest() {
+    return editAvatar(cardInfo.link).then((avatarUrl) => {
+      setProfileAvatar(avatarUrl)
+      close(popupNewProfileImage);
+    }) 
+  }
+  handleSubmit(makeRequest, evt)
+}
+formElementNewProfileImage.addEventListener("submit", createNewProfileImage);
+
+profileImage.addEventListener("click", function () {
+  openPopup(popupNewProfileImage);
+  clearValidation(formElementNewProfileImage, validationConfig)
+});
 
 
-// API
 
-const config = {
-  baseUrl: 'https://nomoreparties.co/v1/wff-cohort-9',
-  headers: {
-    authorization: 'de52b97b-8cdb-4a17-8dd9-b1762867c87f',
-    'Content-Type': 'application/json',
+enableValidation(validationConfig)
+
+  //Хочу дать небольшую подсказку, частенько с этим заданием бывают сложности. 
+  //В ПР7 есть задание сделать модалку, которая подтверждает удаление карточки по клику на кнопку. 
+  //По сути это обычная форма с кнопкой, по сабмиту которой вы должны сделать запрос и в случае успеха удалить карточку из DOM. 
+  //Обычно сложности с тем, а как же понять по какой карточке кликнули, т.е. как получить/передать айди в эту функцию сабмит. 
+  //Тут есть два варианта: 1. Создать в глобальной области index переменную через let, например idCardForDelete и в нее перед открытием окна класть 
+  //айдишник карточки, а потом ее использовать в функции сабмите. 2. Менять саму функцию сабмита. То есть создать такую же переменную через let в index, 
+  //например handleSubmitConfirmPopup, повесить ее как сабмит на форму и уже перед открытием присваивать ей функцию, которую хотим выполнить. И в ней 
+  //уже будет доступ к айдишнику карточке, так как описываем мы функцию удаления при создании карточки, как параметр в createCard, 
+  //соответсвенно можем получить как и имя и ссылку Оба метода рабочие, первый чуть легче. При этом способе модалка может только подтвердить удаление карточки. 
+  //Второй более универсальный. 
+
+function renderLoading(isLoading, element, defaultStatus='Сохранить', loadingStatus='Сохранение...') {
+  if(isLoading) {
+    element.textContent = loadingStatus
+  }
+  else {
+    element.textContent = defaultStatus
   }
 }
 
+function handleSubmit(request, evt, loadingText='Сохранение...') {
+  evt.preventDefault();
+  const submitButton = evt.submitter
+  const defaultStatus = submitButton.textContent
 
-
-//проверяем всё ли в порядке с ответом
-export const handleResponse = (res) => {
-    if (res.ok) {
-      return res.json(); 
-    }
-
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка: ${res.status}`);
-  };
-
-//функция под любой запрос
-const request = (endpoint, options) => {
-  const completeUrl = config.baseUrl + endpoint;
-  return fetch(completeUrl, options).then(handleResponse)
-}
-
-
-//Загрузка карточек с сервера
-const getInitialCards = () => {
-  return request('/cards', {
-    headers: config.headers
-  });
-}
-
-
-//Загрузка информации о пользователе с сервера
-const getInitialUser = () => {
-  return request('/users/me', {
-    headers: config.headers
-  });
-}
-
-  
-//Редактирование профиля
-const editProfile = (newName, newDescription) => {
-  return request('/users/me', {
-    method: 'PATCH',
-    headers: config.headers,
-  
-    body: JSON.stringify({
-      name: `${newName}`,
-      about: `${newDescription}`
+  renderLoading(true, submitButton, defaultStatus, loadingText)
+  request()
+    .then(() => {
+      evt.target.reset();
     })
-  }); 
-}
-
-
-//Создание новой карточки 
-const postNewCard = (nameCard, url) => {
-  return request('/cards', {
-    method: 'POST',
-    headers: config.headers,
-  
-    body: JSON.stringify({
-      name: `${nameCard}`,
-      link: `${url}`
+    .catch((err) => {
+      console.error(err);
     })
-  }); 
-}
-
-const deleteCard = (cardId) => {
-  return request(`/cards/${cardId}`, {
-    method: 'DELETE',
-    headers: config.headers
-  });
-}
-
-const addLike = (cardId) => {
-  return request(`/cards/likes/${cardId}`, {
-    method: 'PUT',
-    headers: config.headers,
-  }); 
-}
-
-const removeLike = (cardId) => {
-  return request(`/cards/likes/${cardId}`, {
-    method: 'DELETE',
-    headers: config.headers,
-  }); 
+    .finally(() => {
+      renderLoading(false, submitButton, defaultStatus, loadingText);
+    });
 }
 
 Promise.all ([getInitialCards(), getInitialUser()])
 .then (([cards, user]) => {
   setProfileInfo(user);
+  setProfileAvatar(user);
   cards.forEach((cardData) => { 
     renderCard(cardData, 'append')
   });

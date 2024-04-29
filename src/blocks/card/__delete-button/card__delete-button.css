@@ -1,4 +1,9 @@
 .card__delete-button {
+  visibility: hidden;
+}
+
+.card__delete-button_is-active {
+  visibility: visible;
   width: 18px;
   height: 18px;
   background: transparent url('../../../images/delete-icon.svg') center no-repeat;

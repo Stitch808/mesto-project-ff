@@ -72,6 +72,20 @@
   </div>
 </div>
 
+<div class="popup popup__new_profile_image">
+  <div class="popup__content popup__content__new_profile_image">
+    <button type="button" class="popup__close"></button>
+    <h3 class="popup__title">Обновить аватар</h3>
+
+    <form class="popup__form" name="new-profile_image">
+      <input id="url-input" type="url" name="link" class="popup__input popup__input_type_avatar" placeholder="Ссылка на картинку" required>
+      <span class="url-input-error popup__input-error"></span>
+      <button type="submit" class="button popup__button">Сохранить</button>
+    </form>
+
+  </div>
+</div>
+
 <template id="card-template">
   <li class="places__item card">
     <img class="card__image" src="" alt="" />

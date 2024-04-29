@@ -17,3 +17,7 @@
     padding: 30px 20px;
   }
 }
+
+.popup__content__new_profile_image {
+  min-height: 272px;
+}

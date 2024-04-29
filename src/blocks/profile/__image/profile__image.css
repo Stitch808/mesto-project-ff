@@ -9,6 +9,30 @@
   margin: 0 29px 0 0;
 }
 
+.profile__image:hover:after {
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: contain;
+  content: url(../../../images/Vector.svg);
+  height: 26px;
+  left: 60px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  width: 26px;
+}
+
+.profile__image:hover:before {
+  background-color: black;
+  border-radius: 50%;
+  content: "";
+  height: 122px;
+  opacity: 0.8;
+  position: absolute;
+  top: 35px;
+  width: 122px;
+}
+
 @media screen and (max-width: 740px) {
   .profile__image {
     margin: 0 10px 0 0;
