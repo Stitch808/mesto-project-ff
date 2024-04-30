@@ -21,6 +21,7 @@ function closeByClick(evt) {
 }
 
 export function close(popup) {
+  popup.classList.remove("popup_is-animated");
   popup.classList.remove("popup_is-opened");
   popup.removeEventListener("click", closeByClick);
   document.removeEventListener('keydown', closeByEsc); 

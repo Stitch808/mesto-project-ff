@@ -22,7 +22,7 @@ export function getCard(cardData, deletCard, openImagePopup, profileId) {
     deleteButton.classList.add("card__delete-button_is-active")
     
     deleteButton.addEventListener("click", function () {
-      cardRemove(cardElement, userId);
+      removeCard(cardElement, userId);
     });
   }
   else {
@@ -35,7 +35,7 @@ export function getCard(cardData, deletCard, openImagePopup, profileId) {
 
   const cardLikeButton = cardElement.querySelector(".card__like-button");
   cardLikeButton.addEventListener("click", () => {
-    likeHandlers(likeCounter, cardLikeButton, userId)
+    handleCardLike(likeCounter, cardLikeButton, userId)
   });
   cardImage.addEventListener("click", openImagePopup);
 
@@ -47,7 +47,7 @@ export function getCard(cardData, deletCard, openImagePopup, profileId) {
 }
 
 // @todo: Функция удаления карточки
-export function cardRemove(cardElement, id) {
+export function removeCard(cardElement, id) {
   deleteCard(id)
   .then (() => {
     cardElement.remove()
@@ -59,7 +59,7 @@ export function cardRemove(cardElement, id) {
 }
 
 //лайк карточки
-const likeHandlers = function (likeCounter, cardLikeButton, userId) {
+const handleCardLike = function (likeCounter, cardLikeButton, userId) {
   if (cardLikeButton.classList.contains("card__like-button_is-active")) {
     removeLike(userId)
     .then ((res) => {

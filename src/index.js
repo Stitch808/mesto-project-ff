@@ -1,23 +1,17 @@
 import "./pages/index.css";
-import { initialCards } from "./scripts/cards.js";
-import { getCard, cardRemove, likeCard, likeHandlers } from "./scripts/card.js";
+import { getCard, removeCard, likeCard, handleCardLike } from "./scripts/card.js";
 import { openPopup, close } from "./scripts/modal.js";
 import {clearValidation, enableValidation} from "./scripts/validation.js"
 import {getInitialCards, getInitialUser, editProfile, postNewCard, editAvatar} from "./scripts/api.js"
-
-
-// @todo: Темплейт карточки
-// @todo: DOM узлы
+import {handleSubmit} from "./scripts/utils.js"
 
 export const cardList = document.querySelector(".places__list");
-
-
 
 let profileId = '';
 
 // @todo: Вывести карточки на страницу
 const renderCard = (cardInfo, method = "prepend") => {
-  const cardElement = getCard(cardInfo, cardRemove, openImagePopup, profileId)
+  const cardElement = getCard(cardInfo, removeCard, openImagePopup, profileId)
   cardList[ method ](cardElement)
 }
 
@@ -63,7 +57,7 @@ const setProfileInfo = (profileData) => {
 }
 
 // Обработчик «отправки» формы
-function handleFormSubmit(evt) {
+function submitEditProfileForm(evt) {
   evt.preventDefault();
   function makeRequest(){
     return editProfile(popupInputTypeName.value, popupInputTypeDescription.value).then((profileData) => {
@@ -75,7 +69,7 @@ function handleFormSubmit(evt) {
   handleSubmit(makeRequest, evt) 
 }
   
-formElementEditProfile.addEventListener("submit", handleFormSubmit);
+formElementEditProfile.addEventListener("submit", submitEditProfileForm);
 
 profileEditButton.addEventListener("click", function () {
   openPopup(popupEdit);
@@ -145,8 +139,6 @@ profileImage.addEventListener("click", function () {
   clearValidation(formElementNewProfileImage, validationConfig)
 });
 
-
-
 enableValidation(validationConfig)
 
   //Хочу дать небольшую подсказку, частенько с этим заданием бывают сложности. 
@@ -159,33 +151,6 @@ enableValidation(validationConfig)
   //уже будет доступ к айдишнику карточке, так как описываем мы функцию удаления при создании карточки, как параметр в createCard, 
   //соответсвенно можем получить как и имя и ссылку Оба метода рабочие, первый чуть легче. При этом способе модалка может только подтвердить удаление карточки. 
   //Второй более универсальный. 
-
-function renderLoading(isLoading, element, defaultStatus='Сохранить', loadingStatus='Сохранение...') {
-  if(isLoading) {
-    element.textContent = loadingStatus
-  }
-  else {
-    element.textContent = defaultStatus
-  }
-}
-
-function handleSubmit(request, evt, loadingText='Сохранение...') {
-  evt.preventDefault();
-  const submitButton = evt.submitter
-  const defaultStatus = submitButton.textContent
-
-  renderLoading(true, submitButton, defaultStatus, loadingText)
-  request()
-    .then(() => {
-      evt.target.reset();
-    })
-    .catch((err) => {
-      console.error(err);
-    })
-    .finally(() => {
-      renderLoading(false, submitButton, defaultStatus, loadingText);
-    });
-}
 
 Promise.all ([getInitialCards(), getInitialUser()])
 .then (([cards, user]) => {

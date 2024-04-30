@@ -28,9 +28,15 @@
 }
 
 .popup__input_type_error:last-of-type {
-  margin-bottom: 10px;
+  margin-bottom: 2px;
 }
 
 .popup__input-error_active {
-  color:#FF0000
+  color:#FF0000;
+  font-family: Inter;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14.52px;
+  text-align: left;
+
 }

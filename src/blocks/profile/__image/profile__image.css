@@ -43,4 +43,12 @@
   .profile__image {
     margin-right: 0;
   }
+  .profile__image:hover:before {
+    left: 80px;
+    top: 42px
+  }
+  .profile__image:hover:after {
+    left: 134px;
+    top: 27%;
+  }
 }
